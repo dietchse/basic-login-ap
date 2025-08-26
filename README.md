@@ -55,8 +55,8 @@ Aplikasi autentikasi fullstack dengan fitur keamanan lengkap yang dibangun mengg
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/basic-login-app.git
-cd basic-login-app
+git clone https://github.com/dietchse/basic-login-ap.git
+cd basic-login-ap
 ```
 
 ### 2. Setup Backend
