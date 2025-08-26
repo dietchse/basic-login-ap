@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  password            String?
+  name                String?
+  firstName           String?
+  lastName            String?
+  profilePicture      String?
+  phone               String?
+  jobTitle            String?
+  company             String?
+  bio                 String?             @db.Text
+  location            String?
+  website             String?
+  roleId              Int
+  role                Role                @relation(fields: [roleId], references: [id])
+  isVerified          Boolean             @default(false)
+  googleId            String?             @unique
+  twoFactorEnabled    Boolean             @default(false)
+  twoFactorSecret     String?
+  twoFactorBackupCodes String?            @db.Text
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  verificationToken   VerificationToken?
+  resetPasswordToken  ResetPasswordToken?
+  sessions            Session[]
+  notificationPreferences NotificationPreferences?
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model ResetPasswordToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique
+  ipAddress    String?
+  userAgent    String?  @db.Text
+  deviceInfo   String?
+  location     String?
+  loginTime    DateTime @default(now())
+  lastActivity DateTime @default(now())
+  expiresAt    DateTime
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model NotificationPreferences {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Email preferences
+  emailNotifications Boolean  @default(true)
+  marketingEmails    Boolean  @default(true)
+  weeklyDigest       Boolean  @default(true)
+  securityAlerts     Boolean  @default(true)
+  
+  // Push notification preferences
+  pushNotifications  Boolean  @default(false)
+  browserNotifications Boolean @default(false)
+  
+  // Communication preferences
+  productUpdates     Boolean  @default(true)
+  systemMaintenance  Boolean  @default(true)
+  newsletters        Boolean  @default(true)
+  
+  // Frequency preferences
+  emailFrequency     String   @default("daily") // daily, weekly, monthly
+  digestFrequency    String   @default("weekly") // weekly, monthly
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
